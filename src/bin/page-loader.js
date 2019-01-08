@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import program from 'commander';
-// import process from 'process';
 import pageLoader from '..';
 
 program
