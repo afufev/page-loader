@@ -42,6 +42,9 @@
     ],
     "coverageReporters": [
       "lcov"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/__tests__/__fixtures__"
     ]
   },
   "devDependencies": {
