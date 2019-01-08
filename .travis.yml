@@ -1,3 +1,9 @@
+---
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=381f926d7623dba8b34bd22d7877c9bc47cd6184aa8e598100a5e0a0309c455b
+
 language: node_js
 node_js:
   - node
@@ -13,5 +19,4 @@ script:
   - bundle exec rspec
 
   after_script:
-   - ./cc-test-reporter format-coverage -t lcov ./coverage/lcov.info
    - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

@@ -32,7 +32,11 @@
   },
   "homepage": "https://github.com/brasid/project-lvl3-s382#readme",
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "collectCoverage": "true",
+    "collectCoverageFrom": ["src**/*.js", "!**/node_modules/**"],
+    "coveragePathIgnorePatterns": ["<rootDir>/src/bin/", "<rootDir>/node_modules/"],
+    "coverageReporters": ["lcov"]
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
