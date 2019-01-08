@@ -1,5 +1,5 @@
 {
-  "name": "page-loader",
+  "name": "brasid-page-loader",
   "version": "0.0.1",
   "description": "student's project - simple js tool to download pages to local machine",
   "bin": {
@@ -50,10 +50,14 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "commander": "^2.19.0",
     "fs": "0.0.1-security",
     "http": "0.0.0",
+    "listr": "^0.14.3",
     "nock": "^10.0.6",
     "os": "^0.1.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "querystring": "^0.2.0",
+    "url": "^0.11.0"
   }
 }
