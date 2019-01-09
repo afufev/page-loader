@@ -39,7 +39,7 @@ describe('step1', () => {
     try {
       await pageLoader('unknown', output);
     } catch (e) {
-      expect(e).toBeInstanceOf(Error);
+      expect(e).toMatchSnapshot();
     }
   });
 });

@@ -5,13 +5,10 @@ import axios from 'axios';
 
 const getDest = (address, output) => {
   const { hostname, pathname } = url.parse(address);
-  let name;
-  if (pathname === '/') {
-    name = hostname;
-  } else {
-    name = `${hostname}${pathname}`;
-  }
-  const filename = name.replace(/\W+/g, '-').concat('.html');
+  const filename = path
+    .join(hostname, pathname)
+    .replace(/\W+/g, '-')
+    .concat('.html');
   return path.resolve(output, filename);
 };
 
@@ -19,6 +16,10 @@ export default (address, output) => {
   const dest = getDest(address, output);
   return axios
     .get(address)
-    .then(({ data }) => fs.writeFile(dest, data))
-    .catch(e => Promise.reject(e));
+    .then(({ data }) => fs.writeFile(dest, data));
 };
+
+
+// const getTitle = body => body.match(/<h1>(.*?)<\/h1>/)[1];
+// const getLinks = body => (body.match(/href="\/(.*?)">/g) || [])
+//   .map(item => item.match(/href="\/(.*?)">/)[1]);
