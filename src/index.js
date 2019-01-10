@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 const getPathName = (address) => {
   const { hostname, pathname } = url.parse(address);
-  const filename = hostname ? path.join(hostname, pathname) : _.trimEnd(pathname, '/');
+  const filename = hostname ? path.join(hostname, pathname) : _.trim(pathname, '/');
   const { dir, name, ext } = path.parse(filename);
   const newFilename = path.join(dir, name).replace(/\W+/g, '-');
   const newPathName = path.format({ name: newFilename, ext });
@@ -31,9 +31,9 @@ const processResources = (data, host) => new Promise((resolve) => {
     $(`${tag}:not([${attribute}^='http']):not([${attribute}^='#'])`)
       .each(function process() {
         const urlPath = $(this).attr(attribute);
-        if (urlPath === currentPage) {
+        if (urlPath && urlPath === currentPage) {
           $(this).attr(attribute, host);
-        } else {
+        } else if (urlPath) {
           const localPath = getPathName(urlPath);
           localLinks.push({ urlPath, localPath });
           $(this).attr(attribute, path.join(resourcesFolderPath, localPath));
