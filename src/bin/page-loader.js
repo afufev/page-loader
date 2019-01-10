@@ -4,7 +4,7 @@ import program from 'commander';
 import pageLoader from '..';
 
 program
-  .version('0.0.1')
+  .version('0.1.2')
   .arguments('<address>')
   .option('-o, --output [type]', 'Output path', process.cwd())
   .description('Downloads page to your local machine with provided path')
