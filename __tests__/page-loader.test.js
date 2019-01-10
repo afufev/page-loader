@@ -74,19 +74,19 @@ describe('load page and resources', () => {
     expect(responseHtml).toMatchSnapshot();
   });
 
-  it('#getCss', async () => {
+  it('#checkCss', async () => {
     const cssFilePath = path.join(output, assetsDirName, cssName);
     const responseCss = await fs.readFile(cssFilePath, 'utf-8');
     expect(responseCss).toBe(expectedCss);
   });
 
-  it('#getImg', async () => {
+  it('#checkImg', async () => {
     const imgFilePath = path.join(output, assetsDirName, imgName);
     const responseImg = await fs.readFile(imgFilePath, 'utf-8');
     expect(responseImg).toBe(expectedImg);
   });
 
-  it('#getscript', async () => {
+  it('#checkScript', async () => {
     const scriptFilePath = path.join(output, assetsDirName, scriptName);
     const responseScript = await fs.readFile(scriptFilePath, 'utf-8');
     expect(responseScript).toBe(expectedScript);
