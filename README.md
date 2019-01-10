@@ -32,8 +32,8 @@ page-loader -h
 
 ```
 
-## Download html page from address
+## Download page with resources from address
 ```sh
 page-loader http://site.org
 ```
-[![asciicast](https://asciinema.org/a/220296.svg)](https://asciinema.org/a/220296)
+[![asciicast](https://asciinema.org/a/220613.svg)](https://asciinema.org/a/220613)
