@@ -65,6 +65,7 @@
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
     "commander": "^2.19.0",
+    "debug": "^4.1.1",
     "fs": "0.0.1-security",
     "http": "0.0.0",
     "listr": "^0.14.3",

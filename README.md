@@ -37,3 +37,9 @@ page-loader -h
 page-loader http://site.org
 ```
 [![asciicast](https://asciinema.org/a/220613.svg)](https://asciinema.org/a/220613)
+
+## Debugging
+To look at the pretty debug log just type:
+```sh
+DEBUG='page-loader*' page-loader http://site.org
+```
