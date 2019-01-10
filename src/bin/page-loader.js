@@ -2,9 +2,10 @@
 
 import program from 'commander';
 import pageLoader from '..';
+import { version } from '../../package.json';
 
 program
-  .version('0.1.2', '-v, --version')
+  .version(version, '-v, --version')
   .arguments('<address>')
   .option('-o, --output [path]', 'Output path', process.cwd())
   .description('Downloads page to your local machine with provided path')
