@@ -12,30 +12,87 @@ nock.disableNetConnect();
 
 axios.defaults.adapter = httpAdapter;
 
-let output;
-let expectedHtml;
-let dest;
-
-const fixturesPathExpectedHtml = './__tests__/__fixtures__/test-hexlet-io-courses.html';
 const host = 'http://ru.hexlet.io/';
-const filename = 'ru-hexlet-io-courses.html';
-const testPath = '/courses';
-const address = url.resolve(host, testPath);
 
+const mainUri = '/courses';
+const cssUri = '/assets/application.css';
+const imgUri = '/assets/hexlet-logo-e99fc2b3b7c1eec88899f3af1435a39aaac6fd29d011dfe2342499c0884b7a96.png';
+const scriptUri = '/assets/script.js';
 
-describe('step1', () => {
-  beforeEach(async () => {
-    output = await fs.mkdtemp(path.resolve(os.tmpdir(), 'page-loader-'));
-    expectedHtml = await fs.readFile(fixturesPathExpectedHtml, 'utf-8');
-    dest = path.join(output, filename);
+const fixturesPath = './__tests__/__fixtures__/';
+const fixturesPathHtml = path.join(fixturesPath, '/mock-hexlet-courses.html');
+// const fixturesPathExpectedHtml = path.join(fixturesPath, '/mock-hexlet-courses-loaded.html');
+const fixturesPathExpectedCss = path.join(fixturesPath, cssUri);
+const fixturesPathExpectedImg = path.join(fixturesPath, imgUri);
+const fixturesPathExpectedScript = path.join(fixturesPath, scriptUri);
+
+const htmlName = 'ru-hexlet-io-courses.html';
+const assetsDirName = 'ru-hexlet-io-courses_files';
+const cssName = 'assets-application.css';
+const imgName = 'assets-hexlet-logo-e99fc2b3b7c1eec88899f3af1435a39aaac6fd29d011dfe2342499c0884b7a96.png';
+const scriptName = 'assets-script.js';
+
+const address = url.resolve(host, mainUri);
+
+let expectedHtml;
+let expectedCss;
+let expectedImg;
+let expectedScript;
+
+let output;
+
+beforeAll(async () => {
+  output = await fs.mkdtemp(path.resolve(os.tmpdir(), 'page-loader-'));
+  expectedHtml = await fs.readFile(fixturesPathHtml, 'utf-8');
+  expectedCss = await fs.readFile(fixturesPathExpectedCss, 'utf-8');
+  expectedImg = await fs.readFile(fixturesPathExpectedImg, 'utf-8');
+  expectedScript = await fs.readFile(fixturesPathExpectedScript, 'utf-8');
+
+  nock(host)
+    .get(mainUri)
+    .reply(200, expectedHtml);
+
+  nock(host)
+    .get(cssUri)
+    .reply(200, expectedCss);
+
+  nock(host)
+    .get(imgUri)
+    .reply(200, expectedImg);
+
+  nock(host)
+    .get(scriptUri)
+    .reply(200, expectedScript);
+
+  await pageLoader(address, output);
+});
+
+describe('load page and resources', () => {
+  it('#getBody', async () => {
+    const htmlFilePath = path.join(output, htmlName);
+    const responseHtml = await fs.readFile(htmlFilePath, 'utf-8');
+    expect(responseHtml).toMatchSnapshot();
   });
-  it('#get', async () => {
-    nock(host).get('/courses').reply(200, expectedHtml);
-    await pageLoader(address, output);
-    const response = await fs.readFile(dest, 'utf-8');
-    expect(response).toBe(expectedHtml);
+
+  it('#getCss', async () => {
+    const cssFilePath = path.join(output, assetsDirName, cssName);
+    const responseCss = await fs.readFile(cssFilePath, 'utf-8');
+    expect(responseCss).toBe(expectedCss);
   });
-  it('#error', async () => {
+
+  it('#getImg', async () => {
+    const imgFilePath = path.join(output, assetsDirName, imgName);
+    const responseImg = await fs.readFile(imgFilePath, 'utf-8');
+    expect(responseImg).toBe(expectedImg);
+  });
+
+  it('#getscript', async () => {
+    const scriptFilePath = path.join(output, assetsDirName, scriptName);
+    const responseScript = await fs.readFile(scriptFilePath, 'utf-8');
+    expect(responseScript).toBe(expectedScript);
+  });
+
+  it('#error1', async () => {
     try {
       await pageLoader('unknown', output);
     } catch (e) {
