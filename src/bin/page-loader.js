@@ -10,5 +10,9 @@ program
   .option('-o, --output [path]', 'Output path', process.cwd())
   .description('Downloads page to your local machine with provided path')
   .action(address => pageLoader(address, program.output));
+// .catch((e) => {
+//   console.error(getLoaderError(e));
+//   process.exit(1);
+// }));
 
 program.parse(process.argv);
