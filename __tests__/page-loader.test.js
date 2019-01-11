@@ -91,12 +91,4 @@ describe('load page and resources', () => {
     const responseScript = await fs.readFile(scriptFilePath, 'utf-8');
     expect(responseScript).toBe(expectedScript);
   });
-
-  it('#error1', async () => {
-    try {
-      await pageLoader('unknown', output);
-    } catch (e) {
-      expect(e).toMatchSnapshot();
-    }
-  });
 });

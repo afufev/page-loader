@@ -1,7 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`load page and resources #error1 1`] = `[NetConnectNotAllowedError: Nock: Disallowed net connect for "localhost:80unknown"]`;
-
 exports[`load page and resources #getBody 1`] = `
 "<!DOCTYPE html><html><head>
     <meta charset=\\"utf-8\\">
