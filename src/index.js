@@ -1,104 +1,55 @@
-import path from 'path';
-import url from 'url';
 import { promises as fs } from 'fs';
-import axios from 'axios';
-import cheerio from 'cheerio';
-import _ from 'lodash';
-import Debug from 'debug';
+import debug from 'debug';
+import StateMachine from 'javascript-state-machine';
 
-const debug = Debug('page-loader');
-const debugHttp = debug.extend('http:');
-const debugFs = debug.extend('filesystem:');
-const debugInfo = debug.extend('info:');
-const debug$ = debug.extend('$:');
+import { getInputData, download, save } from './utils';
 
-const getPathName = (address) => {
-  debugFs('create new filepath for %s', address);
-  const { hostname, pathname } = url.parse(address);
-  const filename = hostname ? path.join(hostname, pathname) : _.trim(pathname, '/');
-  const { dir, name, ext } = path.parse(filename);
-  const newFilename = path.join(dir, name).replace(/\W+/g, '-');
-  const newPathName = path.format({ name: newFilename, ext });
-  return newPathName;
-};
+import { processResources, saveResources } from './fsmMethods';
 
-const tagTypes = {
-  img: 'src',
-  link: 'href',
-  script: 'src',
-};
 
-const processResources = (data, host) => new Promise((resolve) => {
-  debugInfo('begin to process resources');
-  const { pathname: currentPage } = url.parse(host);
-  const $ = cheerio.load(data);
-  debug$('load page as DOM');
-  const localLinks = [];
-  const resourcesFolderPath = `${getPathName(host)}_files`;
-  debugFs('create resources folder');
-  _.keys(tagTypes).forEach((tag) => {
-    const attribute = tagTypes[tag];
-    $(`${tag}:not([${attribute}^='http']):not([${attribute}^='#'])`)
-      .each(function process() {
-        debug$('look for', tag, 'with attribute', attribute);
-        const urlPath = $(this).attr(attribute);
-        if (urlPath && urlPath === currentPage) {
-          debug$('change current page references');
-          $(this).attr(attribute, host);
-        } else if (urlPath) {
-          const localPath = getPathName(urlPath);
-          localLinks.push({ urlPath, localPath });
-          debug$('switch URI path to localPath');
-          $(this).attr(attribute, path.join(resourcesFolderPath, localPath));
-        }
-      });
-  });
-  debugInfo('gathered collection of resources in size of %d', localLinks.length);
-  const processedHtml = $.html();
-  resolve([processedHtml, localLinks]);
+const debugFs = debug('page-loader:fs:');
+const debugStatus = debug('page-loader:status:');
+
+const fsm = new StateMachine({
+  init: 'waitingInput',
+  transitions: [
+    { name: 'getPage', from: 'waitingInput', to: 'pageLoaded' },
+    { name: 'processResources', from: 'pageLoaded', to: 'resourcesProcessed' },
+    { name: 'createResourcesDir', from: 'resourcesProcessed', to: 'directoryCreated' },
+    { name: 'savePage', from: 'directoryCreated', to: 'pageSaved' },
+    { name: 'saveResources', from: 'pageSaved', to: 'resourcesSaved' },
+  ],
+  methods: {
+    // debug-related methods
+    onEnterState: ({ to }) => new Promise((resolve) => {
+      debugStatus('state:', to);
+      setTimeout(resolve, 0);
+    }),
+    onTransition: ({ transition }) => new Promise((resolve) => {
+      debugStatus('transition:', transition);
+      setTimeout(resolve, 0);
+    }),
+    // fsm methods
+    onGetPage: (lc, host) => download(host),
+    onProcessResources: (lc, data, host, resPath) => processResources(data, host, resPath),
+    onCreateResourcesDir: (lc, resPath) => fs.mkdir(resPath),
+    onSavePage: (lc, html, htmlPath) => save(html, htmlPath),
+    onSaveResources: (lc, res, host, resourcesPath) => saveResources(res, host, resourcesPath),
+  },
 });
 
-const download = (host, link, folderPath) => new Promise((resolve) => {
-  const { urlPath, localPath } = link;
-  const address = url.resolve(host, urlPath);
-  debugHttp('GET %s', address);
-  const localPathWithFolder = path.resolve(folderPath, localPath);
-  const requestConf = {
-    method: 'get',
-    url: address,
-    responseType: 'arraybuffer',
-  };
-  const promise = axios(requestConf)
-    .then(response => fs.writeFile(localPathWithFolder, response.data))
-    .then(() => debugFs('save', address, 'to local machine'));
-  resolve(promise);
-});
-
-
-const saveResourcesLocally = (resources, host, output) => new Promise((resolve) => {
-  debugInfo('begin to save resources to the local machine');
-  const pathName = getPathName(host);
-  const localPath = path.join(output, pathName);
-  const htmlPath = `${localPath}.html`;
-  const resourcesPath = `${localPath}_files`;
-  debugFs('create paths for page and resources');
-  const [processedHtml, localLinks] = resources;
-  const promise = fs.writeFile(htmlPath, processedHtml)
-    .then(() => debugFs('write page to file'))
-    .then(() => fs.mkdir(resourcesPath))
-    .then(() => debugFs('create directory for resources'))
-    .then(() => debugInfo('begin to load resources'))
-    .then(() => Promise.all(localLinks.map(link => download(host, link, resourcesPath))));
-  resolve(promise);
-});
-
-
-export default (host, output) => {
-  debugInfo('utility starts');
-  debugHttp('GET %s', host);
-  return axios
-    .get(host)
-    .then(({ data }) => processResources(data, host))
-    .then(resources => saveResourcesLocally(resources, host, output))
-    .then(() => debugInfo('successfully exit utility'));
+export default(host, output) => {
+  const inputData = getInputData(host, output);
+  const { htmlPath, resourcesPath, relativeDirPath } = inputData;
+  let resources;
+  let html;
+  return fsm.getPage(host)
+    .then(({ data }) => fsm.processResources(data, host, relativeDirPath))
+    .then(([processedHtml, localLinks]) => { html = processedHtml; resources = localLinks; })
+    .then(() => fsm.createResourcesDir(resourcesPath))
+    .then(() => debugFs('resources directory created at %s', resourcesPath))
+    .then(() => fsm.savePage(html, htmlPath))
+    .then(() => debugFs('html page saved at %s', htmlPath))
+    .then(() => fsm.saveResources(resources, host, resourcesPath))
+    .then(() => debugFs('resources saved to %s', resourcesPath));
 };
