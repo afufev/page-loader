@@ -4,6 +4,17 @@ exports[`error handling #404: not found 1`] = `"Request failed with status code 
 
 exports[`error handling #443: no host 1`] = `"Request failed with status code 443"`;
 
+exports[`error handling #EEXIST 1`] = `
+"Nock: No match for request {
+  \\"method\\": \\"get\\",
+  \\"url\\": \\"http://ru.hexlet.io/courses\\",
+  \\"headers\\": {
+    \\"accept\\": \\"application/json, text/plain, */*\\",
+    \\"user-agent\\": \\"axios/0.18.0\\"
+  }
+}"
+`;
+
 exports[`error handling #ENOENT 1`] = `
 "Nock: No match for request {
   \\"method\\": \\"get\\",
