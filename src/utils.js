@@ -6,7 +6,7 @@ import axios from 'axios';
 
 export const getPathName = (address) => {
   const { hostname, pathname } = url.parse(address);
-  const filename = hostname ? path.join(hostname, pathname) : _.trim(pathname, '/'); // path.join thrwos error on null
+  const filename = hostname ? path.join(hostname, pathname) : _.trim(pathname, '/'); // path.join throws error on null
   const { dir, name, ext } = path.parse(filename);
   const newFilename = path.join(dir, name).replace(/\W+/g, '-');
   const newPathName = path.format({ name: newFilename, ext });

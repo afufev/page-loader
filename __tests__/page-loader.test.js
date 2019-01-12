@@ -105,7 +105,18 @@ describe('error handling', () => {
 
     nock('http://unknown.ru')
       .get('/')
-      .reply(443);
+      .replyWithError({
+        host: 'unknown',
+        code: 'ENOTFOUND',
+        port: 443,
+      });
+
+    nock('http://www.google.com')
+      .get('/cat-poems')
+      .replyWithError({
+        message: 'something awful happened',
+        code: 'AWFUL_ERROR',
+      });
   });
   const wrongUrl = url.resolve(host, '/wrong');
   it('#404: not found', async () => {
@@ -116,5 +127,8 @@ describe('error handling', () => {
   });
   it('#ENOENT', async () => {
     await expect(pageLoader(address, 'unknown')).rejects.toThrowErrorMatchingSnapshot();
+  });
+  it('#unknown error', async () => {
+    await expect(pageLoader('http://www.google.com/cat-poems', output)).rejects.toThrowErrorMatchingSnapshot();
   });
 });

@@ -4,6 +4,7 @@ import url from 'url';
 import cheerio from 'cheerio';
 import _ from 'lodash';
 import debug from 'debug';
+import ProjectError from './ProjectError';
 
 import {
   getPathName, getInputData, download, save,
@@ -19,8 +20,7 @@ const tagTypes = {
   script: 'src',
 };
 
-const findLinks = (data, host) => {
-  const { pathname: currentPage } = url.parse(host);
+const findLinks = (data, host, currentPage) => {
   const $ = cheerio.load(data);
   debug$('load page %s as DOM', host);
   const links = [];
@@ -38,11 +38,12 @@ const findLinks = (data, host) => {
 };
 
 const processResources = (data, host, relativeDirPath) => {
-  const [$, links] = findLinks(data, host);
+  const { pathname: currentPage } = url.parse(host);
+  const [$, links] = findLinks(data, host, currentPage);
   const localLinks = links.reduce((acc, link) => {
     const { tag, urlPath, localPath } = link;
     const attribute = tagTypes[tag];
-    if (urlPath === host) {
+    if (urlPath === currentPage) {
       debug$('replace %s with %s', attribute, host);
       $(`${tag}[${attribute}^='${urlPath}']`).attr(attribute, host);
       return acc;
@@ -78,5 +79,6 @@ export default (host, output) => {
     .then(() => save(html, htmlPath))
     .then(() => debugFs('html page saved at %s', htmlPath))
     .then(() => saveResources(resources, host, resourcesPath))
-    .then(() => debugFs('resources saved to %s', resourcesPath));
+    .then(() => debugFs('resources saved to %s', resourcesPath))
+    .catch(error => throw new ProjectError(error));
 };
