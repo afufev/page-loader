@@ -47,34 +47,25 @@ beforeAll(async () => {
   expectedCss = await fs.readFile(fixturesPathExpectedCss, 'utf-8');
   expectedImg = await fs.readFile(fixturesPathExpectedImg, 'utf-8');
   expectedScript = await fs.readFile(fixturesPathExpectedScript, 'utf-8');
-
-  nock(host)
-    .get(mainUri)
-    .reply(200, expectedHtml);
-
-  nock(host)
-    .get(cssUri)
-    .reply(200, expectedCss);
-
-  nock(host)
-    .get(imgUri)
-    .reply(200, expectedImg);
-
-  nock(host)
-    .get(scriptUri)
-    .reply(200, expectedScript);
-
-  nock(host)
-    .get('/wrong')
-    .reply(404);
-
-  nock('http://unknown.ru')
-    .get('/')
-    .reply(443);
 });
 
 describe('load page and resources', () => {
   beforeAll(async () => {
+    nock(host)
+      .get(mainUri)
+      .reply(200, expectedHtml);
+
+    nock(host)
+      .get(cssUri)
+      .reply(200, expectedCss);
+
+    nock(host)
+      .get(imgUri)
+      .reply(200, expectedImg);
+
+    nock(host)
+      .get(scriptUri)
+      .reply(200, expectedScript);
     await pageLoader(address, output);
   });
   it('#getBody', async () => {
@@ -103,6 +94,19 @@ describe('load page and resources', () => {
 });
 
 describe('error handling', () => {
+  beforeEach(() => {
+    nock(host)
+      .get(mainUri)
+      .reply(200, expectedHtml);
+
+    nock(host)
+      .get('/wrong')
+      .reply(404);
+
+    nock('http://unknown.ru')
+      .get('/')
+      .reply(443);
+  });
   const wrongUrl = url.resolve(host, '/wrong');
   it('#404: not found', async () => {
     await expect(pageLoader(wrongUrl, output)).rejects.toThrowErrorMatchingSnapshot();
@@ -111,7 +115,7 @@ describe('error handling', () => {
     await expect(pageLoader('http://unknown.ru/', output)).rejects.toThrowErrorMatchingSnapshot();
   });
   it('#ENOENT', async () => {
-    await expect(pageLoader(wrongUrl, 'unknown')).rejects.toThrowErrorMatchingSnapshot();
+    await expect(pageLoader(address, 'unknown')).rejects.toThrowErrorMatchingSnapshot();
   });
   it('#EEXIST', async () => {
     await expect(pageLoader(address, fixturesPath)).rejects.toThrowErrorMatchingSnapshot();
