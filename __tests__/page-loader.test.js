@@ -47,27 +47,28 @@ beforeAll(async () => {
   expectedCss = await fs.readFile(fixturesPathExpectedCss, 'utf-8');
   expectedImg = await fs.readFile(fixturesPathExpectedImg, 'utf-8');
   expectedScript = await fs.readFile(fixturesPathExpectedScript, 'utf-8');
-
-  nock(host)
-    .get(mainUri)
-    .reply(200, expectedHtml);
-
-  nock(host)
-    .get(cssUri)
-    .reply(200, expectedCss);
-
-  nock(host)
-    .get(imgUri)
-    .reply(200, expectedImg);
-
-  nock(host)
-    .get(scriptUri)
-    .reply(200, expectedScript);
-
-  await pageLoader(address, output);
 });
 
 describe('load page and resources', () => {
+  beforeAll(async () => {
+    nock(host)
+      .get(mainUri)
+      .reply(200, expectedHtml);
+
+    nock(host)
+      .get(cssUri)
+      .reply(200, expectedCss);
+
+    nock(host)
+      .get(imgUri)
+      .reply(200, expectedImg);
+
+    nock(host)
+      .get(scriptUri)
+      .reply(200, expectedScript);
+
+    await pageLoader(address, output);
+  });
   it('#getBody', async () => {
     const htmlFilePath = path.join(output, htmlName);
     const responseHtml = await fs.readFile(htmlFilePath, 'utf-8');
@@ -90,5 +91,24 @@ describe('load page and resources', () => {
     const scriptFilePath = path.join(output, assetsDirName, scriptName);
     const responseScript = await fs.readFile(scriptFilePath, 'utf-8');
     expect(responseScript).toBe(expectedScript);
+  });
+});
+
+describe('error handling', () => {
+  nock(host)
+    .get('/wrong')
+    .reply(404);
+  nock('http://unknown.ru')
+    .get('/')
+    .reply(443);
+  const wrongUrl = url.resolve(host, '/wrong');
+  it('#404: not found', async () => {
+    await expect(pageLoader(wrongUrl, output)).rejects.toThrowErrorMatchingSnapshot();
+  });
+  it('#443: no host', async () => {
+    await expect(pageLoader('http://unknown.ru/', output)).rejects.toThrowErrorMatchingSnapshot();
+  });
+  it('#ENOENT', async () => {
+    await expect(pageLoader(wrongUrl, 'unknown')).rejects.toThrowErrorMatchingSnapshot();
   });
 });

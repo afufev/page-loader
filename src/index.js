@@ -13,15 +13,16 @@ const debugStatus = debug('page-loader:status:');
 const fsm = new StateMachine({
   init: 'waitingInput',
   transitions: [
-    { name: 'getPage', from: 'waitingInput', to: 'pageLoaded' },
+    { name: 'getPage', from: '*', to: 'pageLoaded' },
     { name: 'processResources', from: 'pageLoaded', to: 'resourcesProcessed' },
     { name: 'createResourcesDir', from: 'resourcesProcessed', to: 'directoryCreated' },
     { name: 'savePage', from: 'directoryCreated', to: 'pageSaved' },
     { name: 'saveResources', from: 'pageSaved', to: 'resourcesSaved' },
+    { name: 'step', from: 'resourcesSaved', to: 'waitingInput' },
   ],
   methods: {
     // debug-related methods
-    onEnterState: ({ to }) => debugStatus('state:', to),
+    onExitState: ({ to }) => debugStatus('state:', to),
     onTransition: ({ transition }) => debugStatus('transition:', transition),
     // fsm methods
     onGetPage: (lc, host) => download(host),
@@ -33,6 +34,7 @@ const fsm = new StateMachine({
 });
 
 export default (host, output) => {
+  console.log(host);
   const inputData = getInputData(host, output);
   const { htmlPath, resourcesPath, relativeDirPath } = inputData;
   let resources;
@@ -45,5 +47,6 @@ export default (host, output) => {
     .then(() => fsm.savePage(html, htmlPath))
     .then(() => debugFs('html page saved at %s', htmlPath))
     .then(() => fsm.saveResources(resources, host, resourcesPath))
-    .then(() => debugFs('resources saved to %s', resourcesPath));
+    .then(() => debugFs('resources saved to %s', resourcesPath))
+    .then(() => fsm.step());
 };

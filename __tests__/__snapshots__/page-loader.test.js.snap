@@ -1,5 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`error handling #404: not found 1`] = `"Request failed with status code 404"`;
+
+exports[`error handling #443: no host 1`] = `"Request failed with status code 443"`;
+
+exports[`error handling #ENOENT 1`] = `
+"Nock: No match for request {
+  \\"method\\": \\"get\\",
+  \\"url\\": \\"http://ru.hexlet.io/wrong\\",
+  \\"headers\\": {
+    \\"accept\\": \\"application/json, text/plain, */*\\",
+    \\"user-agent\\": \\"axios/0.18.0\\"
+  }
+}"
+`;
+
 exports[`load page and resources #getBody 1`] = `
 "<!DOCTYPE html><html><head>
     <meta charset=\\"utf-8\\">
