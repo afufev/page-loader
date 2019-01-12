@@ -21,14 +21,8 @@ const fsm = new StateMachine({
   ],
   methods: {
     // debug-related methods
-    onEnterState: ({ to }) => new Promise((resolve) => {
-      debugStatus('state:', to);
-      setTimeout(resolve, 0);
-    }),
-    onTransition: ({ transition }) => new Promise((resolve) => {
-      debugStatus('transition:', transition);
-      setTimeout(resolve, 0);
-    }),
+    onEnterState: ({ to }) => debugStatus('state:', to),
+    onTransition: ({ transition }) => debugStatus('transition:', transition),
     // fsm methods
     onGetPage: (lc, host) => download(host),
     onProcessResources: (lc, data, host, resPath) => processResources(data, host, resPath),

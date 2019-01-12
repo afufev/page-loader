@@ -27,11 +27,11 @@ export const processResources = (data, host, relativeDirPath) => new Promise((re
     $(query).each(function processTag() {
       debug$('looking for %s with attribute %s', tag, attribute);
       const urlPath = $(this).attr(attribute);
-      const localPath = getPathName(urlPath);
       if (urlPath && urlPath === currentPage) {
         debug$('replace %s with %s', attribute, host);
         $(this).attr(attribute, host);
       } else if (urlPath) {
+        const localPath = getPathName(urlPath);
         debug$('replace URI path: %s with local path: %s', urlPath, localPath);
         $(this).attr(attribute, path.join(relativeDirPath, localPath));
         linkPaths.push({ urlPath, localPath });

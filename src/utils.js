@@ -8,6 +8,7 @@ export const getPathName = (address) => {
   const { hostname, pathname } = url.parse(address);
   const filename = hostname ? path.join(hostname, pathname) : _.trim(pathname, '/'); // path.join thrwos error on null
   const { dir, name, ext } = path.parse(filename);
+  // console.log(ext);
   const newFilename = path.join(dir, name).replace(/\W+/g, '-');
   const newPathName = path.format({ name: newFilename, ext });
   return newPathName;
