@@ -41,7 +41,7 @@ exports[`load page and resources #getBody 1`] = `
     <footer>
       <p> Hexlet 2019</p>
     </footer>
-
+  
 
 </body></html>"
 `;
