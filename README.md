@@ -44,3 +44,6 @@ To look at the pretty debug log just type:
 DEBUG='page-loader*' page-loader http://site.org
 ```
 [![asciicast](https://asciinema.org/a/220682.svg)](https://asciinema.org/a/220682)
+
+## User-friendly errors
+[![asciicast](https://asciinema.org/a/220978.svg)](https://asciinema.org/a/220978)

@@ -23,7 +23,6 @@ export const getInputData = (host, output) => {
 };
 
 export const download = (host, link = '') => {
-  console.log(host);
   const address = url.resolve(host, link);
   const requestConf = {
     method: 'get',
