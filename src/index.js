@@ -31,7 +31,6 @@ const processResources = (data, host, relativeDirPath) => {
     $(query).each((i, elem) => {
       debug$('looking for tag: %s with attribute: %s', tag, attribute);
       const urlPath = $(elem).attr(attribute);
-      console.log(url.path);
       if (urlPath && urlPath === currentPage) {
         debug$('replace %s with %s', attribute, host);
         $(elem).attr(attribute, host);

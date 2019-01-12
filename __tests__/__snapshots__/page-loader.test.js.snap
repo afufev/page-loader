@@ -4,7 +4,7 @@ exports[`error handling #404: not found 1`] = `"Request failed with status code 
 
 exports[`error handling #443: no host 1`] = `"Request failed with status code 443"`;
 
-exports[`error handling #EEXIST 1`] = `"EEXIST: file already exists, mkdir '__tests__/__fixtures__/ru-hexlet-io-courses_files'"`;
+exports[`error handling #EEXIST 1`] = `"EEXIST: file already exists, mkdir '__tests__/__fixtures__/mock-hexlet-courses-loaded_files'"`;
 
 exports[`error handling #ENOENT 1`] = `"ENOENT: no such file or directory, mkdir 'unknown/ru-hexlet-io-courses_files'"`;
 

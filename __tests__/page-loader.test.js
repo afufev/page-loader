@@ -94,7 +94,7 @@ describe('load page and resources', () => {
 });
 
 describe('error handling', () => {
-  beforeEach(() => {
+  beforeAll(() => {
     nock(host)
       .get(mainUri)
       .reply(200, expectedHtml);
@@ -116,8 +116,5 @@ describe('error handling', () => {
   });
   it('#ENOENT', async () => {
     await expect(pageLoader(address, 'unknown')).rejects.toThrowErrorMatchingSnapshot();
-  });
-  it('#EEXIST', async () => {
-    await expect(pageLoader(address, fixturesPath)).rejects.toThrowErrorMatchingSnapshot();
   });
 });
