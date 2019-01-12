@@ -34,7 +34,6 @@ const fsm = new StateMachine({
 });
 
 export default (host, output) => {
-  console.log(host);
   const inputData = getInputData(host, output);
   const { htmlPath, resourcesPath, relativeDirPath } = inputData;
   let resources;
