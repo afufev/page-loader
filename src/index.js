@@ -12,7 +12,6 @@ import {
 const debugHttp = debug('page-loader:http:');
 const debugFs = debug('page-loader:fs:');
 const debug$ = debug('page-loader:$:');
-// const debugStatus = debug('page-loader:status:');
 
 const tagTypes = {
   img: 'src',
@@ -20,28 +19,38 @@ const tagTypes = {
   script: 'src',
 };
 
-const processResources = (data, host, relativeDirPath) => {
+const findLinks = (data, host) => {
   const { pathname: currentPage } = url.parse(host);
   const $ = cheerio.load(data);
   debug$('load page %s as DOM', host);
-  const localLinks = [];
+  const links = [];
   _.keys(tagTypes).forEach((tag) => {
     const attribute = tagTypes[tag];
-    const query = `${tag}:not([${attribute}^='http']):not([${attribute}^='#'])`;
-    $(query).each((i, elem) => {
-      debug$('looking for tag: %s with attribute: %s', tag, attribute);
-      const urlPath = $(elem).attr(attribute);
-      if (urlPath && urlPath === currentPage) {
-        debug$('replace %s with %s', attribute, host);
-        $(elem).attr(attribute, host);
-      } else if (urlPath) {
-        const localPath = getPathName(urlPath);
-        debug$('replace URI path: %s with local path: %s', urlPath, localPath);
-        $(elem).attr(attribute, path.join(relativeDirPath, localPath));
-        localLinks.push({ urlPath, localPath });
-      }
-    });
+    $(`${tag}[${attribute}]`).not(`[${attribute}^='http']`).not(`[${attribute}^='#']`)
+      .each((i, elem) => {
+        debug$('looking for tag: %s with attribute: %s', tag, attribute);
+        const urlPath = $(elem).attr(attribute);
+        const localPath = (urlPath === currentPage) ? host : getPathName(urlPath);
+        links.push({ tag, urlPath, localPath });
+      });
   });
+  return [$, links];
+};
+
+const processResources = (data, host, relativeDirPath) => {
+  const [$, links] = findLinks(data, host);
+  const localLinks = links.reduce((acc, link) => {
+    const { tag, urlPath, localPath } = link;
+    const attribute = tagTypes[tag];
+    if (urlPath === host) {
+      debug$('replace %s with %s', attribute, host);
+      $(`${tag}[${attribute}^='${urlPath}']`).attr(attribute, host);
+      return acc;
+    }
+    debug$('replace URI path: %s with local path: %s', urlPath, localPath);
+    $(`${tag}[${attribute}^='${urlPath}']`).attr(attribute, path.join(relativeDirPath, localPath));
+    return [...acc, { urlPath, localPath }];
+  }, []);
   return [$.html(), localLinks];
 };
 
