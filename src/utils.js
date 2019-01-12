@@ -8,7 +8,6 @@ export const getPathName = (address) => {
   const { hostname, pathname } = url.parse(address);
   const filename = hostname ? path.join(hostname, pathname) : _.trim(pathname, '/'); // path.join thrwos error on null
   const { dir, name, ext } = path.parse(filename);
-  // console.log(ext);
   const newFilename = path.join(dir, name).replace(/\W+/g, '-');
   const newPathName = path.format({ name: newFilename, ext });
   return newPathName;
@@ -24,7 +23,6 @@ export const getInputData = (host, output) => {
 };
 
 export const download = (host, link = '') => {
-  console.log(host);
   const address = url.resolve(host, link);
   const requestConf = {
     method: 'get',
