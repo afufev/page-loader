@@ -1,6 +1,6 @@
 {
   "name": "brasid-page-loader",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "student's project - simple js tool to download pages to local machine",
   "bin": {
     "page-loader": "dist/bin/page-loader.js"
