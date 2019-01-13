@@ -5,10 +5,11 @@ import cheerio from 'cheerio';
 import _ from 'lodash';
 import debug from 'debug';
 import Listr from 'listr';
+import axios from 'axios';
 import ProjectError from './ProjectError';
 
 import {
-  getPathName, getInputData, download, save,
+  getPathName, getInputData, download, save, normalizeHost,
 } from './utils';
 
 const debugHttp = debug('page-loader:http:');
@@ -63,8 +64,9 @@ const saveResources = (resources, host, resourcesPath) => {
     const { urlPath, localPath } = link;
     const downloadUrl = url.resolve(host, urlPath);
     debugHttp('GET %s', urlPath);
+    const backoff = new Promise(resolve => setTimeout(resolve, 3000)); // slow down listr rendering
     const promise = download(downloadUrl);
-    taskList.push({ title: downloadUrl, task: () => promise });
+    taskList.push({ title: downloadUrl, task: () => backoff.then(() => promise) });
     return promise
       .then(({ data }) => save(data, localPath, resourcesPath))
       .then(() => debugFs('resource %s saved at %s', urlPath, path.join(resourcesPath, localPath)));
@@ -73,6 +75,7 @@ const saveResources = (resources, host, resourcesPath) => {
 };
 
 export default (host, output) => {
+  // const normHost = normalizeHost(host);
   const inputData = getInputData(host, output);
   const { htmlPath, resourcesPath, relativeDirPath } = inputData;
   let resources;
@@ -85,7 +88,7 @@ export default (host, output) => {
     .then(() => save(html, htmlPath))
     .then(() => debugFs('html page saved at %s', htmlPath))
     .then(() => saveResources(resources, host, resourcesPath))
-    .then(() => new Listr(taskList).run())
+    .then(() => new Listr(taskList, { concurrent: true }).run())
     .then(() => debugFs('resources saved to %s', resourcesPath))
     .then(() => htmlPath)
     .catch(error => throw new ProjectError(error));
