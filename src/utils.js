@@ -13,8 +13,8 @@ export const getPathName = (address) => {
   return newPathName;
 };
 
-export const getInputData = (host, output) => {
-  const pathName = getPathName(host);
+export const getInputData = (address, output) => {
+  const pathName = getPathName(address);
   const localPathName = path.join(output, pathName);
   const htmlPath = `${localPathName}.html`;
   const resourcesPath = `${localPathName}_files`;
@@ -22,8 +22,7 @@ export const getInputData = (host, output) => {
   return { htmlPath, resourcesPath, relativeDirPath };
 };
 
-export const download = (host, link = '') => {
-  const address = url.resolve(host, link);
+export const download = (address) => {
   const requestConf = {
     method: 'get',
     url: address,

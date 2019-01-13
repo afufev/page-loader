@@ -4,6 +4,7 @@ import url from 'url';
 import cheerio from 'cheerio';
 import _ from 'lodash';
 import debug from 'debug';
+import Listr from 'listr';
 import ProjectError from './ProjectError';
 
 import {
@@ -55,11 +56,16 @@ const processResources = (data, host, relativeDirPath) => {
   return [$.html(), localLinks];
 };
 
+const taskList = [];
+
 const saveResources = (resources, host, resourcesPath) => {
   const promises = resources.map((link) => {
     const { urlPath, localPath } = link;
+    const downloadUrl = url.resolve(host, urlPath);
     debugHttp('GET %s', urlPath);
-    return download(host, urlPath)
+    const promise = download(downloadUrl);
+    taskList.push({ title: downloadUrl, task: () => promise });
+    return promise
       .then(({ data }) => save(data, localPath, resourcesPath))
       .then(() => debugFs('resource %s saved at %s', urlPath, path.join(resourcesPath, localPath)));
   });
@@ -79,6 +85,8 @@ export default (host, output) => {
     .then(() => save(html, htmlPath))
     .then(() => debugFs('html page saved at %s', htmlPath))
     .then(() => saveResources(resources, host, resourcesPath))
+    .then(() => new Listr(taskList).run())
     .then(() => debugFs('resources saved to %s', resourcesPath))
+    .then(() => htmlPath)
     .catch(error => throw new ProjectError(error));
 };
