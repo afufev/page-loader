@@ -6,8 +6,6 @@ import axios from 'axios';
 
 export const getPathName = (address) => {
   const { hostname, pathname } = url.parse(address);
-  console.log(hostname);
-  console.log(pathname);
   const filename = hostname
     ? _.trim(path.join(hostname, pathname), '/').replace(/[^A-Za-z0-9_]/g, '-')
     : _.trim(pathname, '/').replace(/([^A-Za-z0-9])(?=.*\.)/g, '-'); // all except last dot (for ext)
