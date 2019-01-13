@@ -36,8 +36,7 @@ page-loader -h
 ```sh
 page-loader http://site.org
 ```
-[![asciicast](https://asciinema.org/a/220613.svg)](https://asciinema.org/a/220613)
-
+[![asciicast](https://asciinema.org/a/221142.svg)](https://asciinema.org/a/221142)
 ## Debugging
 To look at the pretty debug log just type:
 ```sh
