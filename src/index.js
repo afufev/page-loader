@@ -50,7 +50,7 @@ const processResources = (data, host, relativeDirPath) => {
       return acc;
     }
     debug$('replace URI path: %s with local path: %s', urlPath, localPath);
-    $(`${tag}[${attribute}^='${urlPath}']`).attr(attribute, path.join(relativeDirPath, localPath));
+    $(`${tag}[${attribute}^='${urlPath}']`).attr(attribute, `${relativeDirPath}${path.sep}${localPath})}`);
     return [...acc, { urlPath, localPath }];
   }, []);
   return [$.html(), localLinks];
