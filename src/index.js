@@ -8,7 +8,7 @@ import Listr from 'listr';
 import ProjectError from './ProjectError';
 
 import {
-  getPathName, getInputData, download, save, normalizeHost,
+  getPathName, getInputData, download, save, normalize,
 } from './utils';
 
 const debugHttp = debug('page-loader:http:');
@@ -74,7 +74,7 @@ const saveResources = (resources, host, resourcesPath) => {
 };
 
 export default (host, output) => {
-  const normHost = normalizeHost(host);
+  const normHost = normalize(host);
   const inputData = getInputData(normHost, output);
   const { htmlPath, resourcesPath, relativeDirPath } = inputData;
   let resources;

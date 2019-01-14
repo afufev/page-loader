@@ -13,7 +13,7 @@ export const getPathName = (address) => {
   return filename;
 };
 
-export const normalizeHost = (host) => {
+export const normalize = (host) => {
   const newUrl = url.parse(host);
   return newUrl.protocol ? host : `https://${host}`;
 };
