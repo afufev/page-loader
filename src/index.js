@@ -5,7 +5,6 @@ import cheerio from 'cheerio';
 import _ from 'lodash';
 import debug from 'debug';
 import Listr from 'listr';
-import axios from 'axios';
 import ProjectError from './ProjectError';
 
 import {
@@ -75,19 +74,19 @@ const saveResources = (resources, host, resourcesPath) => {
 };
 
 export default (host, output) => {
-  // const normHost = normalizeHost(host);
-  const inputData = getInputData(host, output);
+  const normHost = normalizeHost(host);
+  const inputData = getInputData(normHost, output);
   const { htmlPath, resourcesPath, relativeDirPath } = inputData;
   let resources;
   let html;
-  return download(host)
-    .then(({ data }) => processResources(data, host, relativeDirPath))
+  return download(normHost)
+    .then(({ data }) => processResources(data, normHost, relativeDirPath))
     .then(([processedHtml, localLinks]) => { html = processedHtml; resources = localLinks; })
     .then(() => fs.mkdir(resourcesPath))
     .then(() => debugFs('resources directory created at %s', resourcesPath))
     .then(() => save(html, htmlPath))
     .then(() => debugFs('html page saved at %s', htmlPath))
-    .then(() => saveResources(resources, host, resourcesPath))
+    .then(() => saveResources(resources, normHost, resourcesPath))
     .then(() => new Listr(taskList, { concurrent: true }).run())
     .then(() => debugFs('resources saved to %s', resourcesPath))
     .then(() => htmlPath)
