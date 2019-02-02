@@ -7,10 +7,17 @@ import axios from 'axios';
 export const getPathName = (address) => {
   const { hostname, pathname } = url.parse(address);
   const filename = hostname
-    ? _.trim(path.join(hostname, pathname), '/').replace(/[^A-Za-z0-9_]/g, '-')
-    : _.trim(pathname, '/').replace(/([^A-Za-z0-9_.])(?=.*\.)/g, '-'); // all except last dot (for ext)
+    ? _.trim(path.join(hostname, pathname), '/').replace(/[^A-Za-z0-9_]/gi, '-')
+    : _.trim(pathname, '/').replace(/([^A-Za-z0-9.])/gi, '-'); // (?=.*\.) -  all except last dot (for ext)
   return filename;
 };
+
+// const generateName = (pathName, end, template = /[^\w]|[_]/gi) => {
+//   const { dir, name, ext } = path.parse(_.trim(pathName, '/'));
+//   const trimmedPathName = path.join(dir, name);
+//   const extention = end || ext || '';
+//   return `${trimmedPathName.replace(template, '-')}${extention}`;
+// };
 
 export const normalize = (host) => {
   const newUrl = url.parse(host);

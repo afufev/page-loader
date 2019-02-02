@@ -29,7 +29,6 @@ const findLinks = (data, host, currentPage) => {
     const attribute = tagTypes[tag];
     $(`${tag}[${attribute}]`).not(`[${attribute}^='http']`).not(`[${attribute}^='#']`)
       .each((i, elem) => {
-        debug$('looking for tag: %s with attribute: %s', tag, attribute);
         const urlPath = $(elem).attr(attribute);
         const localPath = (urlPath === currentPage) ? host : getPathName(urlPath);
         links.push({ tag, urlPath, localPath });
@@ -62,8 +61,8 @@ const saveResources = (resources, host, resourcesPath) => {
   const promises = resources.map((link) => {
     const { urlPath, localPath } = link;
     const downloadUrl = url.resolve(host, urlPath);
-    debugHttp('GET %s', urlPath);
-    const backoff = new Promise(resolve => setTimeout(resolve, 3000)); // slow down listr rendering
+    debugHttp('GET %s', downloadUrl);
+    const backoff = new Promise(resolve => setTimeout(resolve, 2000)); // slow down listr rendering
     const promise = download(downloadUrl);
     taskList.push({ title: downloadUrl, task: () => backoff.then(() => promise) });
     return promise
