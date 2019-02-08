@@ -46,6 +46,3 @@ DEBUG='page-loader*' page-loader http://site.org
 
 ## User-friendly errors
 [![asciicast](https://asciinema.org/a/220978.svg)](https://asciinema.org/a/220978)
-
-## Task-list output
-[![asciicast](https://asciinema.org/a/221196.svg)](https://asciinema.org/a/221196)
